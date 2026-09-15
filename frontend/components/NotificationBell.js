@@ -15,17 +15,26 @@ export default function NotificationBell() {
   const [items, setItems] = useState([]);
   const [unread, setUnread] = useState(0);
   const boxRef = useRef(null);
+  const sedangMuat = useRef(false);
 
   async function loadNotif() {
-    if (!token) return;
+    if (!token || sedangMuat.current) return;
+    sedangMuat.current = true;
     try {
       const res = await apiGet("/notifikasi", {
         headers: { Authorization: `Bearer ${token}` },
+        // Polling ini jalan di latar belakang tanpa loading UI yang
+        // nunggu, jadi dikasih toleransi lebih lama dibanding request
+        // biasa — supaya gak keburu timeout kalau database sempat
+        // "tidur" (auto-suspend) dan butuh waktu bangun lebih dari 10 detik.
+        timeoutMs: 25000,
       });
       setItems(res.data ?? []);
       setUnread(res.jumlah_belum_dibaca ?? 0);
     } catch (err) {
       console.error("Gagal ambil notifikasi:", err.message);
+    } finally {
+      sedangMuat.current = false;
     }
   }
 

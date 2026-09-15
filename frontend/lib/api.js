@@ -40,13 +40,25 @@ async function fetchDenganTimeout(url, options = {}, timeoutMs = TIMEOUT_MS) {
 }
 
 export async function apiGet(path, options = {}) {
-  const res = await fetchDenganTimeout(`${API_URL}${path}`, {
-    ...options,
-    headers: {
-      Accept: "application/json",
-      ...options.headers,
-    },
-  });
+  const { timeoutMs, ...fetchOptions } = options;
+  const headers = { Accept: "application/json", ...fetchOptions.headers };
+
+  async function ambil() {
+    return fetchDenganTimeout(`${API_URL}${path}`, { ...fetchOptions, headers }, timeoutMs);
+  }
+
+  let res;
+  try {
+    res = await ambil();
+  } catch (err) {
+    // Gagal di level jaringan (timeout/nggak kejangkau) — GET aman
+    // diulang karena idempotent. Seringnya percobaan pertama gagal
+    // cuma gara-gara database cloud lagi "bangun" dari idle; dicoba
+    // sekali lagi dulu (koneksinya harusnya udah hangat) sebelum
+    // benar-benar dianggap gagal, daripada user harus refresh manual.
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    res = await ambil();
+  }
 
   if (!res.ok) {
     throw new Error(`Gagal mengambil data dari ${path} (status ${res.status})`);
@@ -63,11 +75,23 @@ export async function apiGet(path, options = {}) {
  * status kosong.
  */
 export async function apiGetWithStatus(path, timeoutMs) {
-  const res = await fetchDenganTimeout(
-    `${API_URL}${path}`,
-    { headers: { Accept: "application/json" } },
-    timeoutMs
-  );
+  async function ambil() {
+    return fetchDenganTimeout(
+      `${API_URL}${path}`,
+      { headers: { Accept: "application/json" } },
+      timeoutMs
+    );
+  }
+
+  let res;
+  try {
+    res = await ambil();
+  } catch (err) {
+    // Sama seperti apiGet — GET aman diulang, kasih kesempatan sekali
+    // lagi kalau gagal cuma gara-gara database lagi "bangun" dari idle.
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    res = await ambil();
+  }
 
   const data = await res.json().catch(() => null);
   return { ok: res.ok, status: res.status, data };
@@ -144,11 +168,21 @@ export function assetUrl(path) {
  * bukan akses langsung ke storage.
  */
 export async function downloadFile(apiPath, filename, token) {
-  const res = await fetchDenganTimeout(
-    `${API_URL}${apiPath}`,
-    { headers: token ? { Authorization: `Bearer ${token}` } : {} },
-    30000
-  );
+  async function ambil() {
+    return fetchDenganTimeout(
+      `${API_URL}${apiPath}`,
+      { headers: token ? { Authorization: `Bearer ${token}` } : {} },
+      30000
+    );
+  }
+
+  let res;
+  try {
+    res = await ambil();
+  } catch (err) {
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    res = await ambil();
+  }
 
   if (!res.ok) {
     const error = await res.json().catch(() => null);
