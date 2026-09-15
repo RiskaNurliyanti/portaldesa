@@ -105,6 +105,10 @@ export default function Navbar() {
         {user ? (
           <>
             {user.role === "admin" && <Link href="/admin/dashboard">Admin</Link>}
+            <div style={{ padding: "10px 0", display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ fontSize: 14 }}>Notifikasi</span>
+              <NotificationBell />
+            </div>
             <button
               type="button"
               onClick={handleLogout}
