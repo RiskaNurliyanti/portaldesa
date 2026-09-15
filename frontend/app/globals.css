@@ -1,0 +1,898 @@
+/* ==========================================================
+   DESIGN SYSTEM — Website Desa
+   Token warna, tipografi, spacing & komponen dasar diselaraskan
+   dengan referensi desain resmi (lihat DESIGN.md di paket
+   referensi) — nuansa "arsip kedinasan": kertas arsip, hijau
+   sawah, dan merah stempel. Semua didefinisikan di sini pakai
+   CSS variables + class dasar, jadi perubahan di file ini
+   otomatis kepake di semua halaman yang sudah pakai class ini.
+   ========================================================== */
+
+:root {
+  /* ---- Warna ---- */
+  --color-primary: #2f6b4f; /* hijau sawah — warna interaktif utama */
+  --color-primary-dark: #1c4531; /* hover/pressed, kop/header gelap */
+  --color-primary-pale: #d8e5db; /* fill baris aktif, panel penekanan halus */
+  --color-accent: #9c3b30; /* merah stempel — KHUSUS status/stempel penting, JANGAN dipakai buat tombol umum */
+  --color-accent-soft-bg: rgba(156, 59, 48, 0.08);
+  --color-accent-soft-border: rgba(156, 59, 48, 0.3);
+
+  --color-canvas: #edf1e9; /* latar halaman ("kertas arsip") */
+  --color-paper: #ffffff; /* permukaan kartu/dokumen di atas kanvas */
+  --color-bg: var(--color-paper); /* alias lama, dipakai banyak komponen — JANGAN dihapus */
+  --color-bg-alt: var(--color-canvas); /* alias lama — dipakai buat tint/placeholder halus */
+
+  --color-text: #17241c;
+  --color-text-muted: #5c6b5c;
+  --color-white: #ffffff;
+  --color-border: #d1dcd4;
+
+  --color-error: #ba1a1a;
+  --color-error-bg: #ffdad6;
+
+  /* ---- Radius & shadow ---- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 9999px;
+  --max-width: 1200px;
+
+  /* "Tactile paper layering" — kedalaman dari lapisan kertas + garis
+     tipis, BUKAN shadow melayang ala kartu SaaS/glassmorphism. */
+  --shadow-sheet: 0 1px 3px rgba(23, 36, 28, 0.05), 0 1px 2px rgba(23, 36, 28, 0.03);
+  --shadow-elevated: 0 6px 16px -2px rgba(23, 36, 28, 0.08), 0 2px 6px -1px rgba(23, 36, 28, 0.04);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  /* Kanvas halaman sekarang bernuansa kertas arsip (bukan putih polos) —
+     kartu/dokumen (.card, .navbar-mobile, dst) tetap putih DI ATASNYA,
+     jadi kelihatan berlapis kayak kertas di atas meja kerja, bukan flat. */
+  background: var(--color-canvas);
+  color: var(--color-text);
+  font-family: var(--font-body), system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-heading), var(--font-body), system-ui, sans-serif;
+  font-weight: 600; /* serif tegas ala kop surat dinas, bukan italic tipis */
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* Label kecil huruf besar ala cap/stempel — dipakai buat eyebrow, tag
+   kategori, label syarat berkas, dsb di berbagai komponen. */
+.eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ---------- Layout helper ---------- */
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.section {
+  padding: 64px 0;
+}
+
+.section-alt {
+  /* Kanvas default sekarang sudah bertona kertas arsip — jadi "alt" di
+     sini artinya kebalikannya: kasih panel putih buat jeda/kontras. */
+  background: var(--color-bg);
+}
+
+.section-title {
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 8px;
+}
+
+.section-subtitle {
+  color: var(--color-text-muted);
+  margin-bottom: 32px;
+  max-width: 560px;
+}
+
+/* ---------- Buttons ----------
+   Radius 8px (BUKAN pill) — sengaja, biar kesannya formulir/dokumen
+   dinas, bukan tombol gaya startup. Pill (--radius-pill) disimpan
+   khusus buat chip/badge status, bukan tombol aksi. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-solid {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+.btn-solid:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+}
+
+.btn-secondary,
+.btn-outline-primary {
+  background: transparent;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.btn-secondary:hover:not(:disabled),
+.btn-outline-primary:hover:not(:disabled) {
+  background: var(--color-primary-pale);
+}
+
+/* Dipakai di atas foto hero (latar gelap) */
+.btn-primary {
+  background: var(--color-white);
+  color: var(--color-primary-dark);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #eef4f0;
+}
+
+.btn-outline {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--color-white);
+  border-color: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(4px);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* Tombol/link tersier — teks polos, garis bawah pas hover, tanpa latar */
+.btn-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 14px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.btn-link:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Chip / badge status ----------
+   Sistem chip baru sesuai referensi (belum dipakai di semua halaman —
+   menyusul bertahap tiap halaman direstyle di fase berikutnya). */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+}
+
+.chip-stamp {
+  background: var(--color-accent-soft-bg);
+  color: var(--color-accent);
+  border-color: var(--color-accent-soft-border);
+}
+
+.chip-approved {
+  background: var(--color-primary-pale);
+  color: var(--color-primary-dark);
+  border-color: var(--color-primary);
+}
+
+.chip-neutral {
+  background: var(--color-bg-alt);
+  color: var(--color-text-muted);
+  border-color: var(--color-border);
+}
+
+/* Status "sedang berjalan" — outline hijau, beda dari chip-approved yang
+   solid (dipakai buat status FINAL/selesai). */
+.chip-progress {
+  background: var(--color-bg);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* Surat yang sudah terbit tapi kemudian dibatalkan — beda dari
+   chip-stamp (dipakai buat "ditolak") supaya gak ketuker: ditolak
+   berarti belum pernah terbit, dibatalkan berarti sempat terbit lalu
+   dicabut. */
+.chip-cancelled {
+  background: var(--color-error-bg);
+  color: var(--color-error);
+  border-color: var(--color-error);
+}
+
+/* ---------- Navbar ---------- */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.navbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72px;
+  gap: 16px;
+}
+
+.navbar-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.1;
+}
+
+.navbar-brand-overline {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.navbar-brand-name {
+  font-family: var(--font-heading), serif;
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--color-primary-dark);
+}
+
+.navbar-links {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.navbar-links a {
+  color: var(--color-text-muted);
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.navbar-links a:hover {
+  color: var(--color-text);
+  background: var(--color-bg-alt);
+}
+
+.navbar-links a.navbar-link-active {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+.navbar-checkbox {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.navbar-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  flex-shrink: 0;
+  font-size: 22px;
+  color: var(--color-primary-dark);
+  user-select: none;
+}
+
+.navbar-icon-close {
+  display: none;
+}
+
+.navbar-checkbox:checked ~ .container .navbar-icon-open {
+  display: none;
+}
+
+.navbar-checkbox:checked ~ .container .navbar-icon-close {
+  display: inline;
+}
+
+.navbar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  top: 72px;
+  background: rgba(17, 30, 23, 0.35);
+  z-index: 40;
+}
+
+.navbar-checkbox:checked ~ .navbar-backdrop {
+  display: block;
+}
+
+.navbar-mobile {
+  display: none;
+  position: relative;
+  z-index: 45;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 24px 20px;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-white);
+  box-shadow: var(--shadow-elevated);
+}
+
+.navbar-checkbox:checked ~ .navbar-mobile {
+  display: flex;
+}
+
+.navbar-mobile a {
+  padding: 12px 4px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-bg-alt);
+}
+
+@media (min-width: 768px) {
+  .navbar-links {
+    display: flex;
+  }
+  .navbar-toggle {
+    display: none;
+  }
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  position: relative;
+  overflow: hidden;
+  min-height: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("/hero-sawah.png");
+  background-size: cover;
+  background-position: center 65%;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(10, 25, 15, 0.5) 0%,
+    rgba(10, 25, 15, 0.35) 45%,
+    rgba(10, 25, 15, 0.65) 100%
+  );
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 640px;
+  padding: 32px 24px;
+}
+
+.hero-eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #e6e6dd;
+  margin-bottom: 10px;
+}
+
+.hero-title {
+  font-size: 48px;
+  font-weight: 600;
+  font-style: normal;
+  letter-spacing: -0.01em;
+  color: var(--color-white);
+  margin-bottom: 16px;
+}
+
+.hero-desc {
+  font-size: 16px;
+  color: #f1f1e9;
+  margin-bottom: 28px;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 600px) {
+  .hero-title {
+    font-size: 28px;
+  }
+}
+
+/* ---------- Cards ---------- */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+}
+
+.card {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sheet);
+  overflow: hidden;
+}
+
+.card-image {
+  height: 140px;
+  background: var(--color-bg-alt);
+}
+
+.card-body {
+  padding: 16px;
+}
+
+.card-title {
+  font-family: var(--font-heading), serif;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.card-text {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.card-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-primary-dark);
+  background: var(--color-primary-pale);
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  margin-bottom: 10px;
+}
+
+/* ---------- Registry list (daftar berita) ----------
+   Dipakai buat daftar berita, gantiin pola kartu-kotak-seragam yang
+   sering muncul di halaman AI-generated. Tiap baris dipisah garis
+   tipis kayak buku registrasi, bukan kotak dengan bayangan.
+   Garis kiri hijau (.registry-row--baru) NUNJUKIN berita yang masih
+   baru (7 hari terakhir), bukan sekadar hiasan. */
+.registry-list {
+  border-top: 1px solid var(--color-border);
+}
+
+.registry-row {
+  display: flex;
+  gap: 20px;
+  padding: 22px 4px;
+  border-bottom: 1px solid var(--color-border);
+  align-items: flex-start;
+}
+
+.registry-row--baru {
+  border-left: 3px solid var(--color-primary);
+  padding-left: 16px;
+  margin-left: -19px;
+}
+
+.registry-thumb {
+  width: 128px;
+  height: 88px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-bg-alt);
+}
+
+.registry-thumb-image {
+  width: 100%;
+  height: 100%;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.registry-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.registry-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-primary-dark);
+  margin-bottom: 4px;
+}
+
+.registry-title {
+  font-family: var(--font-heading), serif;
+  font-size: 19px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--color-text);
+}
+
+.registry-meta {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+/* Versi ringkas dari registry-row, tanpa thumbnail — buat daftar teks
+   polos kayak preview layanan di homepage. */
+.index-list {
+  border-top: 1px solid var(--color-border);
+}
+
+.index-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding: 18px 4px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.index-row-title {
+  font-family: var(--font-heading), serif;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.index-row-meta {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ---------- Footer ----------
+   Panel arsip terang (bukan blok hijau gelap) — selaras sama nuansa
+   "kertas kedinasan" di seluruh desain, teks & ikon pakai warna hijau
+   gelap/netral, bukan putih di atas hijau. */
+.footer {
+  background: var(--color-bg-alt);
+  color: var(--color-text);
+  padding: 56px 0 24px;
+  margin-top: 64px;
+  border-top: 1px solid var(--color-border);
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 32px;
+  margin-bottom: 32px;
+}
+
+.footer-title {
+  font-family: var(--font-heading), serif;
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 12px;
+  color: var(--color-primary-dark);
+}
+
+.footer-links a {
+  display: block;
+  padding: 4px 0;
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.footer-links a:hover {
+  color: var(--color-primary);
+}
+
+.footer-bottom {
+  border-top: 1px solid var(--color-border);
+  padding-top: 20px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+/* ==========================================================
+   RESPONSIVE — HP & TABLET
+   Section lebih rapat, teks & elemen lebih kecil di layar sempit
+   ========================================================== */
+@media (max-width: 640px) {
+  .container {
+    padding: 0 16px;
+  }
+
+  .section {
+    padding: 40px 0;
+  }
+
+  .section-title {
+    font-size: 24px;
+  }
+
+  .section-subtitle {
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+
+  .card-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .card-image {
+    height: 170px;
+  }
+
+  .hero {
+    min-height: 380px;
+  }
+
+  .hero-desc {
+    font-size: 14px;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 900px) {
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Layout admin (sidebar + konten) numpuk vertikal di layar sempit */
+@media (max-width: 720px) {
+  .admin-layout {
+    flex-direction: column !important;
+  }
+
+  .admin-sidebar {
+    width: 100% !important;
+  }
+}
+
+/* ---------- Auth split-screen (Login/Register) ----------
+   Foto sawah di kiri dengan sapaan, form di kanan. Di HP, foto
+   disembunyikan biar form tetap jadi fokus utama. */
+.auth-split {
+  min-height: calc(100vh - 65px);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.auth-split-photo {
+  position: relative;
+  background-image: url("/hero-sawah.png");
+  background-size: cover;
+  background-position: center 60%;
+  display: flex;
+  align-items: flex-end;
+  padding: 40px;
+}
+
+.auth-split-photo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(10, 25, 15, 0.15) 0%, rgba(10, 25, 15, 0.75) 100%);
+}
+
+.auth-split-photo-text {
+  position: relative;
+  z-index: 1;
+  color: var(--color-white);
+}
+
+.auth-split-photo-text p:first-child {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.9;
+  margin-bottom: 8px;
+}
+
+.auth-split-photo-text h2 {
+  font-size: 30px;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.auth-split-form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+
+@media (max-width: 860px) {
+  .auth-split {
+    grid-template-columns: 1fr;
+  }
+  .auth-split-photo {
+    display: none;
+  }
+}
+
+/* ---------- Document Index (daftar jenis surat di /layanan) ----------
+   Tiap jenis surat jadi satu blok terpisah garis tipis (kayak indeks
+   dokumen/formulir kantor), bukan kartu kotak berdiri sendiri-sendiri. */
+.doc-index {
+  border-top: 1px solid var(--color-border);
+}
+
+.doc-index-item {
+  display: grid;
+  grid-template-columns: 1fr 200px;
+  gap: 24px;
+  padding: 28px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.doc-index-title {
+  font-family: var(--font-heading), serif;
+  font-size: 21px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.doc-index-desc {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin-bottom: 14px;
+}
+
+.doc-index-syarat-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-primary-dark);
+  margin-bottom: 6px;
+}
+
+.doc-index-syarat {
+  font-size: 13.5px;
+  color: var(--color-text-muted);
+  padding-left: 18px;
+  margin: 0;
+}
+
+.doc-index-syarat li {
+  margin-bottom: 3px;
+}
+
+/* Blok fitur galeri (foto + panel info), 2 kolom di desktop, numpuk di HP */
+.galeri-blok {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+}
+
+.berita-unggulan {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+}
+
+@media (max-width: 720px) {
+  .galeri-blok {
+    grid-template-columns: 1fr;
+  }
+  .berita-unggulan {
+    grid-template-columns: 1fr;
+  }
+}
+
+.doc-index-side {
+  border-left: 1px solid var(--color-border);
+  padding-left: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.doc-index-meta {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-bottom: 16px;
+}
+
+.doc-index-meta strong {
+  display: block;
+  color: var(--color-text);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .doc-index-item {
+    grid-template-columns: 1fr;
+  }
+  .doc-index-side {
+    border-left: none;
+    border-top: 1px solid var(--color-border);
+    padding-left: 0;
+    padding-top: 16px;
+  }
+}
